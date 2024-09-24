@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Generator</title>
+    <title>Generador de QR</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
         body {
@@ -14,7 +14,7 @@
             height: 100vh;
             margin: 0;
             background-size: 400% 400%;
-            animation: gradient 10s ease infinite;
+            animation: gradient 15s ease infinite;
         }
 
         @keyframes gradient {
@@ -25,10 +25,10 @@
 
         .container {
             text-align: center;
-            background-color: #ffffff;
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.5s ease, box-shadow 0.5s ease, border 0.5s ease, color 0.5s ease;
         }
 
         input {
@@ -40,10 +40,10 @@
             border-radius: 8px;
             outline: none;
             transition: all 0.3s ease;
+            color: #000;  /* Mantiene el color del texto negro */
         }
 
         input:focus {
-            border-color: #007bff;
             box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
         }
 
@@ -73,9 +73,9 @@
 </head>
 
 <body>
-    <div class="container">
-        <div class="title">QR Code Generator</div>
-        <div class="subtitle">Enter a URL to generate a QR Code</div>
+    <div class="container" id="qr-container">
+        <div class="title">Generador de QR</div>
+        <div class="subtitle">Proporciona un texto para crear el QR</div>
         <input id="text" type="text" value="https://google.com" class="mt-4" />
         <div id="qrcode"></div>
     </div>
@@ -83,7 +83,7 @@
     <script src="https://cdn.jsdelivr.net/gh/baroninn/qrcodejs@master/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/baroninn/qrcodejs@master/qrcode.js"></script>
     <script>
-        // Genera un color hexadecimal aleatorio
+        // Función para generar un color hexadecimal aleatorio
         function getRandomColor() {
             let letters = '0123456789ABCDEF';
             let color = '#';
@@ -93,7 +93,7 @@
             return color;
         }
 
-        // Genera un color de contraste basado en el brillo del color pasado
+        // Función para obtener un color contrastante basado en el brillo del color pasado
         function getContrastingColor(color) {
             const hex = color.replace('#', '');
             const r = parseInt(hex.substring(0, 2), 16);
@@ -101,7 +101,6 @@
             const b = parseInt(hex.substring(4, 6), 16);
 
             const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-
             return brightness > 125 ? '#000000' : '#ffffff';
         }
 
@@ -109,21 +108,35 @@
         var qrcode = new QRCode(document.getElementById("qrcode"), {
             width: 200,
             height: 200,
-            colorDark : "#000000",  // Color por defecto (negro)
-            colorLight : "#ffffff"  // Fondo por defecto (blanco)
+            colorDark : "#000000",  // Color inicial por defecto
+            colorLight : "#ffffff"  // Fondo inicial por defecto
         });
 
-        // Cambia los colores del QR y el fondo del body
+        // Cambia los colores del QR, el fondo del body y del contenedor
         function setQRCodeColors() {
             const qrColor = getRandomColor();
             const bgColor = getContrastingColor(qrColor);
+            const textColor = getContrastingColor(bgColor);  // Asegura el contraste del texto
 
-            // Cambiar colores del QR code
+            // Cambiar colores del QR
             qrcode._htOption.colorDark = qrColor;
             qrcode._htOption.colorLight = bgColor;
 
-            // Aplicar degradado de fondo al body
+            // Aplicar degradado animado de fondo al body
             document.body.style.background = `linear-gradient(135deg, ${qrColor}, ${bgColor})`;
+
+            // Cambiar colores y borde del contenedor
+            const container = document.getElementById('qr-container');
+            container.style.backgroundColor = bgColor;
+            container.style.border = `5px solid ${qrColor}`;
+            container.style.boxShadow = `0 4px 20px ${qrColor}`;
+
+            // Cambiar color del texto en el contenedor
+            container.style.color = textColor;
+
+            // Cambiar el color del borde del input, pero mantener el texto negro
+            const input = document.getElementById('text');
+            input.style.borderColor = qrColor;
         }
 
         // Generar el código QR
