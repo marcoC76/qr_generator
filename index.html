@@ -1,30 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>QR Code Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color: #fcfcfa;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f4f8;
+            margin: 0;
         }
 
-        body * {
-            margin: auto;
+        .container {
             text-align: center;
-            font-size: 21px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         input {
-            display: block;
+            width: 300px;
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 18px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+        }
+
+        #qrcode {
+            width: 200px;
+            height: 200px;
+            margin-top: 20px;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            input {
+                width: 90%;
+            }
         }
     </style>
 </head>
 
 <body>
-    <input id="text" type="text" value="https://google.com" style="width:200px" class="mt-4" />
-    <div id="qrcode" style="width:200px; height:200px; margin-top:15px;"></div>
+    <div class="container">
+        <div class="title">QR Code Generator</div>
+        <div class="subtitle">Enter a URL to generate a QR Code</div>
+        <input id="text" type="text" value="https://google.com" class="mt-4" />
+        <div id="qrcode"></div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/gh/baroninn/qrcodejs@master/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/baroninn/qrcodejs@master/qrcode.js"></script>
@@ -33,28 +80,27 @@
             width: 200,
             height: 200
         });
+
         function makeCode() {
             var elText = document.getElementById("text");
 
             if (!elText.value) {
-                //alert("Input a text");
                 elText.focus();
                 return;
             }
 
             qrcode.makeCode(elText.value);
         }
+
         makeCode();
-        $("#text").
-            on("blur", function () {
+
+        $("#text").on("blur", function () {
+            makeCode();
+        }).on("keydown", function (e) {
+            if (e.keyCode == 13) {
                 makeCode();
-            }).
-            on("keydown", function (e) {
-                if (e.keyCode == 13) {
-                    makeCode();
-                }
-            });
+            }
+        });
     </script>
 </body>
-
 </html>
