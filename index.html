@@ -12,8 +12,15 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0f4f8;
             margin: 0;
+            background-size: 400% 400%;
+            animation: gradient 10s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .container {
@@ -43,7 +50,6 @@
         #qrcode {
             width: 200px;
             height: 200px;
-            /* margin-top: 20px; */
             margin: 20px auto 0 auto;
         }
 
@@ -77,11 +83,50 @@
     <script src="https://cdn.jsdelivr.net/gh/baroninn/qrcodejs@master/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/baroninn/qrcodejs@master/qrcode.js"></script>
     <script>
+        // Genera un color hexadecimal aleatorio
+        function getRandomColor() {
+            let letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Genera un color de contraste basado en el brillo del color pasado
+        function getContrastingColor(color) {
+            const hex = color.replace('#', '');
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+            return brightness > 125 ? '#000000' : '#ffffff';
+        }
+
+        // Inicializa el QR code una sola vez
         var qrcode = new QRCode(document.getElementById("qrcode"), {
             width: 200,
-            height: 200
+            height: 200,
+            colorDark : "#000000",  // Color por defecto (negro)
+            colorLight : "#ffffff"  // Fondo por defecto (blanco)
         });
 
+        // Cambia los colores del QR y el fondo del body
+        function setQRCodeColors() {
+            const qrColor = getRandomColor();
+            const bgColor = getContrastingColor(qrColor);
+
+            // Cambiar colores del QR code
+            qrcode._htOption.colorDark = qrColor;
+            qrcode._htOption.colorLight = bgColor;
+
+            // Aplicar degradado de fondo al body
+            document.body.style.background = `linear-gradient(135deg, ${qrColor}, ${bgColor})`;
+        }
+
+        // Generar el código QR
         function makeCode() {
             var elText = document.getElementById("text");
 
@@ -90,11 +135,14 @@
                 return;
             }
 
-            qrcode.makeCode(elText.value);
+            setQRCodeColors();  // Cambiar los colores aleatorios
+            qrcode.makeCode(elText.value);  // Generar el código QR con el nuevo valor
         }
 
+        // Generar el primer QR
         makeCode();
 
+        // Añadir eventos para generar el QR al presionar enter o al perder el foco
         $("#text").on("blur", function () {
             makeCode();
         }).on("keydown", function (e) {
